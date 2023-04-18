@@ -1,8 +1,8 @@
 import pandas as pd
 
 # Abrindo Database
-conjuntos = pd.read_csv("IA/Conjuntos.csv")
-produtos = pd.read_csv("IA/Produtos.csv")
+conjuntos = pd.read_csv("dataframes/Conjuntos.csv")
+produtos = pd.read_csv("dataframes/Produtos.csv")
 df_conjuntos = pd.DataFrame(conjuntos)
 df_produtos = pd.DataFrame(produtos)
 
@@ -64,19 +64,21 @@ def reuse(df, search_nums):
         
         # criar novo caso (objeto) com novos ids de produto e novo preço
         return {ID: "5", CONJUNTO: result, PRECO: new_price}
-
        
-def is_clothing_type_repeated():
+def has_repeated_types(clothes):
     # conferir se alguma peça de roupa é de tipo repetido
     # exemplo: dois tênis, duas camisas, etc
+    print("Is repeated.")
 
 # Definindo uma função de revisão
-def review():
-    if not is_clothing_type_repeated():
+def review(clothes):
+    if not has_repeated_types(clothes):
         # adicionar à base de casos
+        print("Is not repeated.")
     else:
         # remover roupas repetidas ate só ter 1 peça de cada tipo
         # aí vai cair em cima
+        print("Is repeated.")
 
 # Teste
 
