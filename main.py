@@ -14,23 +14,28 @@ columns = ["TIPO", "COR", "CATEGORIA"]
 for c in columns:
     del df_produtos[c]
 
-conjuntos["CONJUNTO"] = conjuntos["CONJUNTO"].astype(str)
-
+print(conjuntos)
+conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].str.replace('[', '')
+conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].str.replace(']', '')
+print(conjuntos)
 conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].apply(lambda x: [int(numero) for numero in x.split(",")])
+
 
 
 #conjuntos["CONJUNTO"] = list(map(int, conjuntos["CONJUNTO"].split(",")))
 # Definindo uma função de similaridade
 
 def busca(search_nums, conjuntos):
-    #print(search_nums)
+    print(search_nums)
+    print(conjuntos)
     if len(search_nums) == 0:
         return 0
     else:
         conjuntos["bool"] = conjuntos['CONJUNTO'].apply(lambda conjunto: set(search_nums).issubset(set(conjunto)))
-        #print(con)
+        x = set(conjuntos['CONJUNTO'].iloc[0])
+        print(x)
         if True not in conjuntos["bool"].values:
-            #print("Não está")
+            print("Não está")
             search_nums.pop()
             busca(search_nums, conjuntos)
         else:
@@ -40,7 +45,8 @@ def drop_false(df_dropped):
     return df_dropped.drop(df_dropped[df_dropped['bool'] == False].index)
     
 def similarity(search_nums, conjuntos):
-    busca(search_nums, conjuntos)
+    x = busca(search_nums, conjuntos)
+    print(x, "ASDASDASDASDASDASDASDASDAS")
     df = conjuntos
     df = drop_false(df)
     return df
@@ -53,10 +59,11 @@ def pricing(result_ids):
 
 # Reusando caso e adaptando
 def reuse(df, search_nums):
-    if df["CONJUNTO"].values[0] == search_nums:
+    print(df)
+    if df["CONJUNTO"].iloc[0] == search_nums:
         print("é perfeito - ", search_nums)
     else:
-        most_similar = df["CONJUNTO"].values[0]
+        most_similar = df["CONJUNTO"].iloc[0]
 
         num_dif_remove = set(most_similar) - set(search_nums)
         num_dif_add = set(search_nums) - set(most_similar)
@@ -66,9 +73,8 @@ def reuse(df, search_nums):
         result = list(result)
         new_price = pricing(result)
         
-        id = df.iloc[df.shape[0]-1]['ID']
         # criar novo caso (objeto) com novos ids de produto e novo preço
-        new_case = ClothingSet(id, result, new_price)
+        new_case = ClothingSet(result, new_price)
         # print(new_case.id, new_case.conjunto, new_case.preco)
         return new_case
     
@@ -105,7 +111,7 @@ def add_new_case(case, df):
     nova_linha = pd.Series(case.toArray(), index=df.columns)
     df.loc[-1] = nova_linha
     df = df.reset_index(drop=True)
-    df.to_csv('dataframes/Conjuntos.csv')
+    df.to_csv('dataframes/Conjuntos.csv', index=False)
     #print(case)
 # Definindo uma função de revisão
 # def review(clothes):
@@ -123,13 +129,15 @@ def add_new_case(case, df):
 numeros_pesquisa = [2,19,24,8] # Array de números que deseja pesquisar
 copia_numeros = []+numeros_pesquisa
 df_sim = similarity(copia_numeros, conjuntos)
-
+del df_sim["bool"]
+print("ASDADASDASDDASDASD",df_sim)
 case = reuse(df_sim, numeros_pesquisa)
-caso_mockado = ClothingSet("59", [2, 5, 10, 13], 210.20)
+caso_mockado = ClothingSet([2, 5, 10, 13], 210.20)
 new_case = has_repeated_types(caso_mockado)
 
 del conjuntos["bool"]
 
-add_new_case(new_case, conjuntos)
+print(conjuntos)
+add_new_case(caso_mockado, conjuntos)
 
 #similarity(animes, 50, "Action")
