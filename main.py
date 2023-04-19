@@ -1,29 +1,20 @@
 import pandas as pd
-
 from classes.ClothingSet import ClothingSet
 
-# Abrindo Database
+# Abrindo dataframe
 conjuntos = pd.read_csv("dataframes/Conjuntos.csv")
 produtos = pd.read_csv("dataframes/Produtos.csv")
 df_conjuntos = pd.DataFrame(conjuntos)
 df_produtos = pd.DataFrame(produtos)
 
 # Excluindo colunas desnecessárias
-
 columns = ["TIPO", "COR", "CATEGORIA"]
 for c in columns:
     del df_produtos[c]
 
-print(conjuntos)
 conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].str.replace('[', '')
 conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].str.replace(']', '')
-print(conjuntos)
 conjuntos['CONJUNTO'] = conjuntos['CONJUNTO'].apply(lambda x: [int(numero) for numero in x.split(",")])
-
-
-
-#conjuntos["CONJUNTO"] = list(map(int, conjuntos["CONJUNTO"].split(",")))
-# Definindo uma função de similaridade
 
 def busca(search_nums, conjuntos):
     print(search_nums)
@@ -41,9 +32,11 @@ def busca(search_nums, conjuntos):
         else:
             return conjuntos
 
+# Dropando casos não similares
 def drop_false(df_dropped):
     return df_dropped.drop(df_dropped[df_dropped['bool'] == False].index)
     
+# Definindo uma função de similaridade
 def similarity(search_nums, conjuntos):
     x = busca(search_nums, conjuntos)
     print(x, "ASDASDASDASDASDASDASDASDAS")
@@ -73,21 +66,14 @@ def reuse(df, search_nums):
         result = list(result)
         new_price = pricing(result)
         
-        # criar novo caso (objeto) com novos ids de produto e novo preço
         new_case = ClothingSet(result, new_price)
-        # print(new_case.id, new_case.conjunto, new_case.preco)
         return new_case
     
 def get_type_from_id(id):
     type = produtos.loc[produtos["ID"] == id, "VESTIR"].iloc[0]
-
     return [type, id]
 
-# def 
-
 def has_repeated_types(clothes):
-    # conferir se alguma peça de roupa é de tipo repetido
-    # exemplo: dois tênis, duas camisas, etc
     types = []
     for clothing in clothes.conjunto:
         types.append(get_type_from_id(clothing))
@@ -106,31 +92,18 @@ def has_repeated_types(clothes):
             print(clothes.conjunto)
     return clothes        
     
+# Adicionando novo caso à base
 def add_new_case(case, df):
-    
     nova_linha = pd.Series(case.toArray(), index=df.columns)
     df.loc[-1] = nova_linha
     df = df.reset_index(drop=True)
     df.to_csv('dataframes/Conjuntos.csv', index=False)
-    #print(case)
-# Definindo uma função de revisão
-# def review(clothes):
-#     repeated_types = has_repeated_types(clothes)
-#     if repeated_types is not None:
-#         print(repeated_types)
-#         for i in repeated_types:
-#             clothes.conjunto.remove(i)
-            
-#         print(clothes.conjunto)
-#     else:
-#         print("Não há valores repetidos")
-# Teste
 
+# Teste
 numeros_pesquisa = [2,19,24,8] # Array de números que deseja pesquisar
 copia_numeros = []+numeros_pesquisa
 df_sim = similarity(copia_numeros, conjuntos)
 del df_sim["bool"]
-print("ASDADASDASDDASDASD",df_sim)
 case = reuse(df_sim, numeros_pesquisa)
 caso_mockado = ClothingSet([2, 5, 10, 13], 210.20)
 new_case = has_repeated_types(caso_mockado)
@@ -140,4 +113,3 @@ del conjuntos["bool"]
 print(conjuntos)
 add_new_case(caso_mockado, conjuntos)
 
-#similarity(animes, 50, "Action")
